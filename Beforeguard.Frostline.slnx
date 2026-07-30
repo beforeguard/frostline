@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Beforeguard.Frostline.Core/Beforeguard.Frostline.Core.fsproj" />
+    <Project Path="src/Beforeguard.Frostline.WoW/Beforeguard.Frostline.WoW.fsproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Beforeguard.Frostline.Core.Tests/Beforeguard.Frostline.Core.Tests.fsproj" />
+    <Project Path="tests/Beforeguard.Frostline.WoW.Tests/Beforeguard.Frostline.WoW.Tests.fsproj" />
+  </Folder>
+</Solution>
