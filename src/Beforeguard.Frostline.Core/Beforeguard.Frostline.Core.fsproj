@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="Region.fs" />
+    <Compile Include="BattleNetHttpClient.fs" />
   </ItemGroup>
 
 </Project>
