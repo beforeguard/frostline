@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Region.fs" />
+    <Compile Include="ClientConfig.fs" />
+    <Compile Include="TokenManager.fs" />
     <Compile Include="BattleNetHttpClient.fs" />
   </ItemGroup>
 
