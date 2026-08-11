@@ -12,10 +12,10 @@ type BattleNetHttpClient(region: Region, tokenManager: TokenManager) =
     let baseUrl = sprintf "https://%s" (Region.toHostname region)
     
     /// Make an authenticated GET request to the specified path
-    member this.GetAsync(path: string) : Task<string> =
+    member this.getAsync(path: string) : Task<string> =
         async {
             // Get a valid access token (cached or fresh)
-            let! token = tokenManager.GetAccessTokenAsync()
+            let! token = tokenManager.getAccessToken()
             
             // Build the full URL
             let url = sprintf "%s%s" baseUrl path

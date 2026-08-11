@@ -20,7 +20,7 @@ type TokenManager(config: ClientConfig) =
     let mutable tokenExpiry: DateTimeOffset option = None
     
     /// Request a new access token from Battle.net
-    member private this.RequestNewToken() =
+    member private this.requestNewToken() =
         async {
             let tokenEndpoint = ClientConfig.getTokenEndpoint config
             printfn "Requesting new token from: %s" tokenEndpoint
@@ -47,7 +47,7 @@ type TokenManager(config: ClientConfig) =
         }
     
     /// Check if the cached token is still valid
-    member private this.IsTokenValid() =
+    member private this.isTokenValid() =
         match tokenExpiry with
         | None -> false
         | Some expiry -> 
@@ -55,15 +55,15 @@ type TokenManager(config: ClientConfig) =
             expiry > DateTimeOffset.UtcNow.AddMinutes(5.0)
     
     /// Get a valid access token (cached or new)
-    member this.GetAccessTokenAsync() =
+    member this.getAccessToken() =
         async {
-            match cachedToken, this.IsTokenValid() with
+            match cachedToken, this.isTokenValid() with
             | Some token, true ->
                 printfn "Using cached token"
                 return token
             | _ ->
                 printfn "Token expired or missing, requesting new one"
-                return! this.RequestNewToken()
+                return! this.requestNewToken()
         }
     
     interface IDisposable with
