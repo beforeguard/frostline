@@ -32,6 +32,8 @@ Frostline provides type-safe, async-first access to World of Warcraft, Diablo, S
 
 This is a learning-focused project demonstrating F# best practices for SDK development.
 
+> **⚠️ Disclaimer**: This is an unofficial, community-created project and is not affiliated with, endorsed by, or supported by Blizzard Entertainment, Inc. Battle.net, World of Warcraft, Diablo, StarCraft, and all associated properties are trademarks or registered trademarks of Blizzard Entertainment, Inc.
+
 ## Quick Start
 
 ```fsharp
@@ -121,6 +123,14 @@ dotnet run --project cli/Beforeguard.Frostline.Cli
 ## Contributing
 
 This project is in active development. Contributions, suggestions, and feedback welcome!
+
+## Legal
+
+This project is not affiliated with, endorsed by, or supported by Blizzard Entertainment, Inc. 
+
+Battle.net®, World of Warcraft®, Diablo®, StarCraft®, and related logos are registered trademarks or trademarks of Blizzard Entertainment, Inc. in the U.S. and/or other countries.
+
+This SDK uses the publicly available Battle.net API which requires users to obtain their own API credentials from https://develop.battle.net and agree to Blizzard's API Terms of Use.
 
 ## License
 
