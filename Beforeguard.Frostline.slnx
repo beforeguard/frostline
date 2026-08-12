@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/cli/">
+    <Project Path="cli/Beforeguard.Frostline.Cli/Beforeguard.Frostline.Cli.fsproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Beforeguard.Frostline.Core/Beforeguard.Frostline.Core.fsproj" />
     <Project Path="src/Beforeguard.Frostline.WoW/Beforeguard.Frostline.WoW.fsproj" />
