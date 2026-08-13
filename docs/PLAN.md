@@ -2,6 +2,21 @@
 
 > A modern, idiomatic F# SDK for Blizzard APIs.
 
+## Current Status (as of 2026-08-13)
+
+**Version:** `0.2-dev` (First WoW Endpoint)
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| Phase 1 - Foundation | ✅ **COMPLETE** | OAuth, HTTP client, configuration all working |
+| Phase 2 - WoW SDK | 🚧 **IN PROGRESS** | Character Profile ✅ complete (Equipment & Guild pending) |
+| Phase 3 - CLI | 🚧 **IN PROGRESS** | `character get` command ✅ complete with pretty output |
+| Phase 4+ | 📋 **PLANNED** | Error handling, CI/CD, publishing |
+
+**Latest Achievement:** First complete WoW API endpoint with F# domain types, unit tests, and CLI support! 🎉
+
+---
+
 ## Vision
 
 Frostline is a community-built .NET/F# SDK that provides a clean, strongly typed interface to Blizzard's APIs.
@@ -19,36 +34,36 @@ The **Frostline CLI** will serve as the primary consumer and reference applicati
 
 ---
 
-# Phase 1 — Foundation
+# Phase 1 — Foundation ✅ COMPLETE
 
 **Goal:** Establish the project and prove the basic architecture.
 
 ### Frostline
 
-- [ ] Create `Beforeguard/Frostline`
-- [ ] Create F# solution
-- [ ] Establish project structure
-- [ ] Set up testing
+- [x] Create `Beforeguard/Frostline`
+- [x] Create F# solution
+- [x] Establish project structure
+- [x] Set up testing
 - [ ] Set up CI
 - [ ] Establish package naming and versioning conventions
-- [ ] Create initial documentation
+- [x] Create initial documentation
 
 ### Core
 
-- [ ] HTTP client infrastructure
-- [ ] OAuth authentication
-- [ ] Token management
-- [ ] JSON serialization
-- [ ] Basic error handling
-- [ ] Configuration
+- [x] HTTP client infrastructure
+- [x] OAuth authentication
+- [x] Token management
+- [x] JSON serialization
+- [ ] Basic error handling (deferred to Phase 4)
+- [x] Configuration
 
-**Milestone:** Frostline can authenticate and make an authenticated Blizzard API request.
+**Milestone:** ✅ Frostline can authenticate and make an authenticated Blizzard API request.
 
 ---
 
-# Phase 2 — WoW SDK
+# Phase 2 — WoW SDK 🚧 IN PROGRESS
 
-**Goal:** Build the first useful Blizzard API surface.**
+**Goal:** Build the first useful Blizzard API surface.
 
 Create:
 
@@ -60,26 +75,26 @@ Start with a small number of endpoints.
 
 ### Initial capabilities
 
-- [ ] Character profile
+- [x] Character profile ✅
 - [ ] Character equipment
 - [ ] Guild information
 
 ### F# design
 
-- [ ] Strong domain types
-- [ ] Records
-- [ ] Discriminated unions where appropriate
-- [ ] `Option` for optional data
-- [ ] `Result` for expected failures
-- [ ] Map external API models into Frostline models
+- [x] Strong domain types
+- [x] Records
+- [x] Discriminated unions where appropriate
+- [x] `Option` for optional data
+- [ ] `Result` for expected failures (deferred to Phase 4)
+- [x] Map external API models into Frostline models
 
-**Milestone:** Frostline provides a clean, strongly typed F# interface to a useful subset of WoW APIs.
+**Milestone:** 🚧 Partially achieved - Character Profile endpoint complete with tests and CLI support.
 
 ---
 
-# Phase 3 — Frostline CLI
+# Phase 3 — Frostline CLI 🚧 IN PROGRESS
 
-**Goal:** Build a real application that consumes Frostline.**
+**Goal:** Build a real application that consumes Frostline.
 
 Create:
 
@@ -90,21 +105,21 @@ Frostline.Cli
 Initial capabilities:
 
 ~~~text
-frostline wow character get
-frostline wow character equipment
-frostline wow guild get
+frostline character get <realm> <characterName> ✅
+frostline character equipment
+frostline guild get
 ~~~
 
 The CLI should remain relatively simple.
 
 Its purpose is to:
 
-- Demonstrate Frostline
-- Exercise the public API
-- Provide a useful sample application
-- Reveal weaknesses in the SDK design
+- [x] Demonstrate Frostline
+- [x] Exercise the public API
+- [x] Provide a useful sample application
+- [x] Reveal weaknesses in the SDK design
 
-**Milestone:** The CLI can perform useful WoW queries entirely through Frostline.
+**Milestone:** 🚧 Partially achieved - CLI supports character profile queries with pretty formatting.
 
 ---
 
@@ -418,3 +433,63 @@ and allow the architecture to evolve as real requirements appear.
 | `3.0+` | Broader ecosystem, tooling, and community |
 
 The important part is that **1.0 does not mean "all Blizzard APIs."** It means Frostline has reached the point where its architecture, public API, documentation, testing, and packaging are good enough that someone else could confidently consume it.
+
+---
+
+# Next Steps - Suggested GitHub Issues
+
+Based on current progress, here are recommended issues to create:
+
+## High Priority (Foundation Polish)
+
+1. **Add CI/CD Pipeline** (Phase 1)
+   - Set up GitHub Actions for build and test
+   - Run tests on PR and main branch
+   - Validate .NET 10 compatibility
+
+2. **Add Package Versioning** (Phase 1)
+   - Create Directory.Build.props with version numbers
+   - Standardize NuGet metadata
+   - Set up semantic versioning
+
+3. **Error Handling with Result Types** (Phase 4)
+   - Replace exceptions with `Result<'T, ApiError>`
+   - Add structured error types (AuthError, HttpError, ApiError)
+   - Update TokenManager and BattleNetHttpClient
+   - Update tests for error scenarios
+
+## Medium Priority (WoW Expansion)
+
+4. **Character Equipment Endpoint** (Phase 2)
+   - Add equipment types and item domain models
+   - Implement `CharacterEquipment.get` function
+   - Add tests for equipment deserialization
+   - Add `frostline character equipment` CLI command
+
+5. **Guild Information Endpoint** (Phase 2)
+   - Add guild roster and detail types
+   - Implement `Guild.get` function
+   - Add tests for guild data
+   - Add `frostline guild get` CLI command
+
+## Nice to Have (Quality of Life)
+
+6. **Improve CLI Output**
+   - Add JSON output option (`--format json`)
+   - Add color support (red for Horde, blue for Alliance)
+   - Better error messages for user input
+
+7. **Add More Tests**
+   - Test URL building and normalization
+   - Test token caching and expiry
+   - Integration tests (optional, requires API credentials)
+
+## Documentation
+
+8. **Improve README**
+   - Add code examples
+   - Document all CLI commands
+   - Add screenshots of output
+   - Contributing guide
+
+Current milestone: **v0.2** - First WoW endpoint complete! 🎉
