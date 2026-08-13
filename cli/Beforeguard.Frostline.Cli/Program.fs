@@ -32,6 +32,51 @@ let loadConfigFromEnvironment () =
     
     ClientConfig.create clientId clientSecret region
 
+let displayCharacterCard (profile: CharacterProfile.CharacterProfile) =
+    printfn ""
+    printfn "╔═══════════════════════════════════════════════════════════╗"
+    printfn "║              CHARACTER PROFILE                            ║"
+    printfn "╚═══════════════════════════════════════════════════════════╝"
+    printfn ""
+    
+    // Name and basic info
+    printfn "  %s" profile.Name
+    printfn "  %s" (String.replicate profile.Name.Length "─")
+    
+    // Level, Race, Class
+    let specInfo = 
+        match profile.ActiveSpec with
+        | Some spec -> sprintf " (%s)" spec.Name
+        | None -> ""
+    printfn "  Level %d %s %s%s" profile.Level profile.Race.Name profile.CharacterClass.Name specInfo
+    
+    // Faction
+    let factionIcon = if profile.Faction.Type = "HORDE" then "🔴" else "🔵"
+    printfn "  %s %s" factionIcon profile.Faction.Name
+    
+    printfn ""
+    printfn "  SERVER"
+    printfn "  %s" profile.Realm.Name
+    
+    printfn ""
+    printfn "  ITEM LEVEL"
+    printfn "  %d equipped | %d average" profile.EquippedItemLevel profile.AverageItemLevel
+    
+    printfn ""
+    printfn "  ACHIEVEMENT POINTS"
+    printfn "  %s" (profile.AchievementPoints.ToString("N0"))
+    
+    match profile.Guild with
+    | Some guild ->
+        printfn ""
+        printfn "  GUILD"
+        printfn "  <%s> @ %s" guild.Name guild.Realm
+    | None -> ()
+    
+    printfn ""
+    printfn "───────────────────────────────────────────────────────────"
+    printfn ""
+
 [<EntryPoint>]
 let main argv =
     printfn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -49,26 +94,13 @@ let main argv =
         | "character" :: "get" :: realm :: characterName :: _ ->
             // Character get command
             printfn "\n🔍 Fetching character: %s @ %s..." characterName realm
+            printfn "   Authenticating..."
             
             let profile = 
                 CharacterProfile.get httpClient clientConfig.Region realm characterName
                 |> Async.RunSynchronously
             
-            printfn "\n✅ Character: %s" profile.Name
-            printfn "   Level %d %s %s" profile.Level profile.Race.Name profile.CharacterClass.Name
-            printfn "   Faction: %s" profile.Faction.Name
-            printfn "   Realm: %s" profile.Realm.Name
-            
-            match profile.ActiveSpec with
-            | Some spec -> printfn "   Spec: %s" spec.Name
-            | None -> ()
-            
-            printfn "   Item Level: %d (equipped: %d)" profile.AverageItemLevel profile.EquippedItemLevel
-            printfn "   Achievement Points: %d" profile.AchievementPoints
-            
-            match profile.Guild with
-            | Some guild -> printfn "   Guild: <%s> @ %s" guild.Name guild.Realm
-            | None -> printfn "   Guild: None"
+            displayCharacterCard profile
             
             0 // Success
             
