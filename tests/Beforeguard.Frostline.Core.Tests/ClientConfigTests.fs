@@ -12,37 +12,23 @@ let ``create builds config with all provided values`` () =
     Assert.Equal("my-secret", config.ClientSecret)
     Assert.Equal(Region.EU, config.Region)
 
-[<Fact>]
-let ``getTokenEndpoint returns battle.net for US region`` () =
-    let config = ClientConfig.create "id" "secret" Region.US
+[<Theory>]
+[<InlineData("US", "https://oauth.battle.net/token")>]
+[<InlineData("EU", "https://oauth.battle.net/token")>]
+[<InlineData("KR", "https://oauth.battle.net/token")>]
+[<InlineData("TW", "https://oauth.battle.net/token")>]
+[<InlineData("CN", "https://oauth.battlenet.com.cn/token")>]
+let ``getTokenEndpoint returns correct endpoint for region`` (regionStr: string) (expectedEndpoint: string) =
+    let region = 
+        match regionStr with
+        | "US" -> Region.US
+        | "EU" -> Region.EU
+        | "CN" -> Region.CN
+        | "KR" -> Region.KR
+        | "TW" -> Region.TW
+        | _ -> failwith $"Unknown region: {regionStr}"
+    
+    let config = ClientConfig.create "id" "secret" region
     let endpoint = ClientConfig.getTokenEndpoint config
 
-    Assert.Equal("https://oauth.battle.net/token", endpoint)
-
-[<Fact>]
-let ``getTokenEndpoint returns battlenet.com.cn for CN region`` () =
-    let config = ClientConfig.create "id" "secret" Region.CN
-    let endpoint = ClientConfig.getTokenEndpoint config
-
-    Assert.Equal("https://oauth.battlenet.com.cn/token", endpoint)
-
-[<Fact>]
-let ``getTokenEndpoint returns battle.net for EU region`` () =
-    let config = ClientConfig.create "id" "secret" Region.EU
-    let endpoint = ClientConfig.getTokenEndpoint config
-
-    Assert.Equal("https://oauth.battle.net/token", endpoint)
-
-[<Fact>]
-let ``getTokenEndpoint returns battle.net for KR region`` () =
-    let config = ClientConfig.create "id" "secret" Region.KR
-    let endpoint = ClientConfig.getTokenEndpoint config
-
-    Assert.Equal("https://oauth.battle.net/token", endpoint)
-
-[<Fact>]
-let ``getTokenEndpoint returns battle.net for TW region`` () =
-    let config = ClientConfig.create "id" "secret" Region.TW
-    let endpoint = ClientConfig.getTokenEndpoint config
-
-    Assert.Equal("https://oauth.battle.net/token", endpoint)
+    Assert.Equal(expectedEndpoint, endpoint)
