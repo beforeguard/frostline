@@ -25,3 +25,24 @@ let ``getTokenEndpoint returns battlenet.com.cn for CN region`` () =
     let endpoint = ClientConfig.getTokenEndpoint config
 
     Assert.Equal("https://oauth.battlenet.com.cn/token", endpoint)
+
+[<Fact>]
+let ``getTokenEndpoint returns battle.net for EU region`` () =
+    let config = ClientConfig.create "id" "secret" Region.EU
+    let endpoint = ClientConfig.getTokenEndpoint config
+
+    Assert.Equal("https://oauth.battle.net/token", endpoint)
+
+[<Fact>]
+let ``getTokenEndpoint returns battle.net for KR region`` () =
+    let config = ClientConfig.create "id" "secret" Region.KR
+    let endpoint = ClientConfig.getTokenEndpoint config
+
+    Assert.Equal("https://oauth.battle.net/token", endpoint)
+
+[<Fact>]
+let ``getTokenEndpoint returns battle.net for TW region`` () =
+    let config = ClientConfig.create "id" "secret" Region.TW
+    let endpoint = ClientConfig.getTokenEndpoint config
+
+    Assert.Equal("https://oauth.battle.net/token", endpoint)
