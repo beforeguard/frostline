@@ -39,61 +39,60 @@ let main argv =
     printfn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
     try
-        // Load configuration from User Secrets and environment variables
-        printfn "\n📋 Loading configuration..."
+        // Load configuration
         let clientConfig = loadConfigFromEnvironment()
-        printfn "✅ Region: %s" (Region.toString clientConfig.Region)
-        printfn "✅ Client ID: %s..." (clientConfig.ClientId.Substring(0, min 8 clientConfig.ClientId.Length))
-        
-        // Test OAuth token acquisition
-        printfn "\n🔐 Testing OAuth Token Acquisition..."
         use tokenManager = new TokenManager(clientConfig)
+        use httpClient = new BattleNetHttpClient(clientConfig.Region, tokenManager)
         
-        let token = tokenManager.getAccessToken() |> Async.RunSynchronously
-        printfn "✅ Access token acquired!"
-        printfn "   Token preview: %s..." (token.Substring(0, min 30 token.Length))
-        printfn "   Token length: %d characters" token.Length
-        
-        // Test HTTP client
-        printfn "\n🌐 Testing HTTP Client..."
-        let httpClient = new BattleNetHttpClient(clientConfig.Region, tokenManager)
-        
-        // Try a real API call - WoW realm index
-        printfn "   Fetching WoW realm index..."
-        let result = 
-            httpClient.getAsync("/data/wow/achievement/index?namespace=static-us&locale=en_US") 
-            |> Async.AwaitTask 
-            |> Async.RunSynchronously
-        
-        printfn "✅ API Response received!"
-        printfn "   Response size: %d bytes" result.Length
-        printfn "   Response preview:"
-        printfn "   %s..." (result.Substring(0, min 200 result.Length))
-        
-        // Test Character Profile API
-        printfn "\n🎮 Testing WoW Character Profile API..."
-        let! profile = 
-            Beforeguard.Frostline.WoW.CharacterProfile.get 
-                httpClient 
-                clientConfig.Region 
-                "Tichondrius" 
-                "Beforeguard"
-            |> Async.RunSynchronously
-
-        printfn "✅ Character loaded: %s" profile.Name
-        printfn "   Level: %d %s %s" profile.Level profile.Race.Name profile.CharacterClass.Name
-        printfn "   Faction: %s" profile.Faction.Name
-        printfn "   Spec: %s" (match profile.ActiveSpec with | Some spec -> spec.Name | None -> "None")
-        printfn "   Item Level: %d" profile.EquippedItemLevel
-        match profile.Guild with
-        | Some guild -> printfn "   Guild: <%s>" guild.Name
-        | None -> printfn "   Guild: None"
-
-        printfn "\n✨ All tests passed!"
-        0 // Success exit code
-        
+        // Parse command-line arguments
+        match argv |> Array.toList with
+        | "character" :: "get" :: realm :: characterName :: _ ->
+            // Character get command
+            printfn "\n🔍 Fetching character: %s @ %s..." characterName realm
+            
+            let profile = 
+                CharacterProfile.get httpClient clientConfig.Region realm characterName
+                |> Async.RunSynchronously
+            
+            printfn "\n✅ Character: %s" profile.Name
+            printfn "   Level %d %s %s" profile.Level profile.Race.Name profile.CharacterClass.Name
+            printfn "   Faction: %s" profile.Faction.Name
+            printfn "   Realm: %s" profile.Realm.Name
+            
+            match profile.ActiveSpec with
+            | Some spec -> printfn "   Spec: %s" spec.Name
+            | None -> ()
+            
+            printfn "   Item Level: %d (equipped: %d)" profile.AverageItemLevel profile.EquippedItemLevel
+            printfn "   Achievement Points: %d" profile.AchievementPoints
+            
+            match profile.Guild with
+            | Some guild -> printfn "   Guild: <%s> @ %s" guild.Name guild.Realm
+            | None -> printfn "   Guild: None"
+            
+            0 // Success
+            
+        | [] | ["help"] | ["-h"] | ["--help"] ->
+            // Show usage
+            printfn "\nUsage:"
+            printfn "  frostline character get <realm> <characterName>"
+            printfn ""
+            printfn "Examples:"
+            printfn "  frostline character get tichondrius beforeguard"
+            printfn "  frostline character get \"area 52\" thrall"
+            printfn ""
+            printfn "Configuration:"
+            printfn "  Region: %s (from config)" (Region.toString clientConfig.Region)
+            0
+            
+        | _ ->
+            printfn "\n❌ Unknown command: %s" (String.concat " " argv)
+            printfn "Run 'frostline help' for usage information."
+            1
+            
     with
     | ex ->
         printfn "\n❌ Error: %s" ex.Message
-        printfn "Stack trace:\n%s" ex.StackTrace
-        1 // Error exit code
+        if ex.InnerException <> null then
+            printfn "   Details: %s" ex.InnerException.Message
+        1
