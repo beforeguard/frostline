@@ -4,6 +4,33 @@ open Microsoft.Extensions.Configuration
 
 type Marker = class end
 
+let loadConfigFromEnvironment () =
+    let config = 
+        ConfigurationBuilder()
+            .AddUserSecrets<Marker>()
+            .AddEnvironmentVariables()
+            .Build()
+    
+    let clientId = config.["BattleNet:ClientId"]
+    let clientSecret = config.["BattleNet:ClientSecret"]
+    let regionStr = config.["BattleNet:Region"]
+    
+    if String.IsNullOrWhiteSpace(clientId) then
+        failwith "BattleNet:ClientId not configured. Use dotnet user-secrets or environment variables."
+    if String.IsNullOrWhiteSpace(clientSecret) then
+        failwith "BattleNet:ClientSecret not configured. Use dotnet user-secrets or environment variables."
+    
+    let region = 
+        match (if String.IsNullOrWhiteSpace(regionStr) then "US" else regionStr.ToUpperInvariant()) with
+        | "US" -> Region.US
+        | "EU" -> Region.EU
+        | "KR" -> Region.KR
+        | "TW" -> Region.TW
+        | "CN" -> Region.CN
+        | _ -> failwithf "Invalid region: %s. Must be US, EU, KR, TW, or CN" regionStr
+    
+    ClientConfig.create clientId clientSecret region
+
 [<EntryPoint>]
 let main argv =
     printfn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -13,19 +40,7 @@ let main argv =
     try
         // Load configuration from User Secrets and environment variables
         printfn "\n📋 Loading configuration..."
-        let config = 
-            ConfigurationBuilder()
-                .AddUserSecrets<Marker>()
-                .AddEnvironmentVariables()
-                .Build()
-        
-        // Set environment variables for Core library to read
-        Environment.SetEnvironmentVariable("BNET_CLIENT_ID", config.["BattleNet:ClientId"])
-        Environment.SetEnvironmentVariable("BNET_CLIENT_SECRET", config.["BattleNet:ClientSecret"])
-        Environment.SetEnvironmentVariable("BNET_REGION", config.["BattleNet:Region"])
-        
-        // Create client configuration from environment
-        let clientConfig = ClientConfig.fromEnvironment()
+        let clientConfig = loadConfigFromEnvironment()
         printfn "✅ Region: %s" (Region.toString clientConfig.Region)
         printfn "✅ Client ID: %s..." (clientConfig.ClientId.Substring(0, min 8 clientConfig.ClientId.Length))
         
