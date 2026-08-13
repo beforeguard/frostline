@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beforeguard.Frostline.Core\Beforeguard.Frostline.Core.fsproj" />
+    <ProjectReference Include="..\..\src\Beforeguard.Frostline.WoW\Beforeguard.Frostline.WoW.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿open System
 open Beforeguard.Frostline.Core
+open Beforeguard.Frostline.WoW
 open Microsoft.Extensions.Configuration
 
 type Marker = class end
@@ -69,6 +70,25 @@ let main argv =
         printfn "   Response preview:"
         printfn "   %s..." (result.Substring(0, min 200 result.Length))
         
+        // Test Character Profile API
+        printfn "\n🎮 Testing WoW Character Profile API..."
+        let! profile = 
+            Beforeguard.Frostline.WoW.CharacterProfile.get 
+                httpClient 
+                clientConfig.Region 
+                "Tichondrius" 
+                "Beforeguard"
+            |> Async.RunSynchronously
+
+        printfn "✅ Character loaded: %s" profile.Name
+        printfn "   Level: %d %s %s" profile.Level profile.Race.Name profile.CharacterClass.Name
+        printfn "   Faction: %s" profile.Faction.Name
+        printfn "   Spec: %s" (match profile.ActiveSpec with | Some spec -> spec.Name | None -> "None")
+        printfn "   Item Level: %d" profile.EquippedItemLevel
+        match profile.Guild with
+        | Some guild -> printfn "   Guild: <%s>" guild.Name
+        | None -> printfn "   Guild: None"
+
         printfn "\n✨ All tests passed!"
         0 // Success exit code
         
