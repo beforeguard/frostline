@@ -106,23 +106,14 @@ module CharacterProfile =
     let get (httpClient: Beforeguard.Frostline.Core.BattleNetHttpClient) 
             (region: Beforeguard.Frostline.Core.Region) 
             (realm: string) 
-            (characterName: string) : Async<CharacterProfile> =
+            (characterName: string) =
         async {
-            // Normalize realm name (spaces to hyphens, lowercase)
             let normalizedRealm = realm.ToLower().Replace(" ", "-")
             let normalizedName = characterName.ToLower()
-            
-            // Build the API path
             let regionStr = Beforeguard.Frostline.Core.Region.toString region
             let path = sprintf "/profile/wow/character/%s/%s?namespace=profile-%s&locale=en_US" 
-                              normalizedRealm normalizedName regionStr
+                            normalizedRealm normalizedName regionStr
             
-            // Make the HTTP request
-            let! json = httpClient.getAsync(path) |> Async.AwaitTask
-            
-            // Deserialize the JSON response
-            let options = System.Text.Json.JsonSerializerOptions()
-            options.PropertyNameCaseInsensitive <- true
-            
-            return System.Text.Json.JsonSerializer.Deserialize<CharacterProfile>(json, options)
+            let! result = httpClient.getAsync<CharacterProfile>(path) |> Async.AwaitTask
+            return result
         }

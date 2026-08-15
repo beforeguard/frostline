@@ -96,13 +96,20 @@ let main argv =
             printfn "\n🔍 Fetching character: %s @ %s..." characterName realm
             printfn "   Authenticating..."
             
-            let profile = 
+            let result = 
                 CharacterProfile.get httpClient clientConfig.Region realm characterName
                 |> Async.RunSynchronously
             
-            displayCharacterCard profile
-            
-            0 // Success
+            match result with
+            | Ok profile ->
+                displayCharacterCard profile
+                0 // Success
+            | Error (FrostlineError.GeneralError(message, innerEx)) ->
+                printfn "\n❌ Error: %s" message
+                match innerEx with
+                | Some ex -> printfn "   Details: %s" ex.Message
+                | None -> ()
+                1
             
         | [] | ["help"] | ["-h"] | ["--help"] ->
             // Show usage

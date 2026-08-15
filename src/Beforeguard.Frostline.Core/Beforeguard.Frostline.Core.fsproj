@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="FrostlineError.fs" />
     <Compile Include="Region.fs" />
     <Compile Include="ClientConfig.fs" />
     <Compile Include="TokenManager.fs" />
