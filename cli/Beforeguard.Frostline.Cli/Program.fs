@@ -71,7 +71,7 @@ let displayCharacterCard (profile: CharacterProfile.CharacterProfile) =
     | Some guild ->
         printfn ""
         printfn "  GUILD"
-        printfn "  <%s> @ %s" guild.Name guild.Realm
+        printfn "  <%s> @ %s" guild.Name guild.Realm.Name
     | None -> ()
     
     printfn ""

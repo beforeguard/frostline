@@ -59,7 +59,7 @@ module CharacterProfile =
         Name: string
 
         [<JsonPropertyName("realm")>]
-        Realm: string
+        Realm: Realm
     }
 
     type CharacterProfile = {
