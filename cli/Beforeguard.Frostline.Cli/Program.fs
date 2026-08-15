@@ -2,6 +2,7 @@
 open Beforeguard.Frostline.Core
 open Beforeguard.Frostline.WoW
 open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.Logging
 
 type Marker = class end
 
@@ -84,10 +85,23 @@ let main argv =
     printfn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
     try
+        // Create logger factory
+        use loggerFactory = LoggerFactory.Create(fun builder ->
+            builder
+                .AddConsole()
+                .SetMinimumLevel(LogLevel.Debug)
+            |> ignore
+        )
+        
         // Load configuration
         let clientConfig = loadConfigFromEnvironment()
-        use tokenManager = new TokenManager(clientConfig)
-        use httpClient = new BattleNetHttpClient(clientConfig.Region, tokenManager)
+        
+        // Create loggers and components
+        let tokenManagerLogger = loggerFactory.CreateLogger<TokenManager>()
+        let httpClientLogger = loggerFactory.CreateLogger<BattleNetHttpClient>()
+        
+        use tokenManager = new TokenManager(clientConfig, tokenManagerLogger)
+        use httpClient = new BattleNetHttpClient(clientConfig.Region, tokenManager, httpClientLogger)
         
         // Parse command-line arguments
         match argv |> Array.toList with

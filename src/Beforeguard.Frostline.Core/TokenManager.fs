@@ -4,6 +4,8 @@ open System
 open System.Collections.Generic
 open System.Net.Http
 open System.Text.Json
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Logging.Abstractions
 
 /// Response from OAuth token endpoint
 type TokenResponse = {
@@ -13,8 +15,9 @@ type TokenResponse = {
 }
 
 /// Manages OAuth access tokens
-type TokenManager(config: ClientConfig) =
+type TokenManager(config: ClientConfig, ?logger: ILogger<TokenManager>) =
     
+    let logger = defaultArg logger (NullLogger<TokenManager>.Instance :> ILogger<TokenManager>)
     let httpClient = new HttpClient()
     let mutable cachedToken: string option = None
     let mutable tokenExpiry: DateTimeOffset option = None
@@ -23,7 +26,7 @@ type TokenManager(config: ClientConfig) =
     member private this.requestNewToken() =
         async {
             let tokenEndpoint = ClientConfig.getTokenEndpoint config
-            printfn "Requesting new token from: %s" tokenEndpoint
+            logger.LogDebug("Requesting new token from: {TokenEndpoint}", tokenEndpoint)
             
             // Create form data for client credentials grant
             let formData = new FormUrlEncodedContent([
@@ -38,7 +41,7 @@ type TokenManager(config: ClientConfig) =
             let! json = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             let tokenResponse = JsonSerializer.Deserialize<TokenResponse>(json)
             
-            printfn "Token received, expires in %d seconds" tokenResponse.expires_in
+            logger.LogInformation("Token received, expires in {ExpiresIn} seconds", tokenResponse.expires_in)
             
             cachedToken <- Some tokenResponse.access_token
             tokenExpiry <- Some (DateTimeOffset.UtcNow.AddSeconds(float tokenResponse.expires_in))
@@ -59,10 +62,10 @@ type TokenManager(config: ClientConfig) =
         async {
             match cachedToken, this.isTokenValid() with
             | Some token, true ->
-                printfn "Using cached token"
+                logger.LogDebug("Using cached access token")
                 return token
             | _ ->
-                printfn "Token expired or missing, requesting new one"
+                logger.LogInformation("Token expired or missing, requesting new token")
                 return! this.requestNewToken()
         }
     

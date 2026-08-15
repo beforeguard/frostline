@@ -5,10 +5,13 @@ open System.Net.Http
 open System.Net.Http.Headers
 open System.Text.Json
 open System.Threading.Tasks
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Logging.Abstractions
 
 /// Simple HTTP client for making requests to Blizzard APIs with OAuth authentication
-type BattleNetHttpClient(region: Region, tokenManager: TokenManager) =
+type BattleNetHttpClient(region: Region, tokenManager: TokenManager, ?logger: ILogger<BattleNetHttpClient>) =
     
+    let logger = defaultArg logger (NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient>)
     let httpClient = new HttpClient()
     let baseUrl = sprintf "https://%s" (Region.toHostname region)
     
@@ -18,7 +21,7 @@ type BattleNetHttpClient(region: Region, tokenManager: TokenManager) =
             try
                 let! token = tokenManager.getAccessToken()
                 let url = sprintf "%s%s" baseUrl path
-                printfn "Making authenticated GET request to: %s" url
+                logger.LogDebug("Making authenticated GET request to: {Url}", url)
                 
                 httpClient.DefaultRequestHeaders.Authorization <- 
                     new AuthenticationHeaderValue("Bearer", token)
@@ -28,14 +31,20 @@ type BattleNetHttpClient(region: Region, tokenManager: TokenManager) =
                 
                 let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
                 
+                logger.LogDebug("Received JSON response: {Json}", content)
+                
                 // Deserialize here
                 let options = JsonSerializerOptions()
                 options.PropertyNameCaseInsensitive <- true
                 let result = JsonSerializer.Deserialize<'T>(content, options)
                 
+                logger.LogInformation("Successfully deserialized {Type} from {Path}", typeof<'T>.Name, path)
+                
                 return Ok result
             with
-            | ex -> return Error (FrostlineError.GeneralError("HTTP request failed", Some ex))
+            | ex -> 
+                logger.LogError(ex, "HTTP request failed for path: {Path}", path)
+                return Error (FrostlineError.GeneralError("HTTP request failed", Some ex))
         }
         |> Async.StartAsTask
     
