@@ -27,20 +27,45 @@ type BattleNetHttpClient(region: Region, tokenManager: TokenManager, ?logger: IL
                     new AuthenticationHeaderValue("Bearer", token)
                 
                 let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-                response.EnsureSuccessStatusCode() |> ignore
                 
-                let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-                
-                logger.LogDebug("Received JSON response: {Json}", content)
-                
-                // Deserialize here
-                let options = JsonSerializerOptions()
-                options.PropertyNameCaseInsensitive <- true
-                let result = JsonSerializer.Deserialize<'T>(content, options)
-                
-                logger.LogInformation("Successfully deserialized {Type} from {Path}", typeof<'T>.Name, path)
-                
-                return Ok result
+                // Check status code and map to specific errors
+                if response.IsSuccessStatusCode then
+                    let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+                    
+                    logger.LogDebug("Received JSON response: {Json}", content)
+                    
+                    // Deserialize here
+                    let options = JsonSerializerOptions()
+                    options.PropertyNameCaseInsensitive <- true
+                    let result = JsonSerializer.Deserialize<'T>(content, options)
+                    
+                    logger.LogInformation("Successfully deserialized {Type} from {Path}", typeof<'T>.Name, path)
+                    
+                    return Ok result
+                else
+                    // Map HTTP status codes to specific errors
+                    let error = 
+                        match int response.StatusCode with
+                        | 404 -> 
+                            logger.LogWarning("Resource not found: {Path}", path)
+                            FrostlineError.NotFound(path)
+                        | 401 | 403 -> 
+                            logger.LogWarning("Unauthorized access to: {Path}", path)
+                            FrostlineError.Unauthorized("Authentication failed or insufficient permissions")
+                        | 429 ->
+                            let retryAfter = 
+                                match response.Headers.RetryAfter with
+                                | null -> None
+                                | header when header.Delta.HasValue -> 
+                                    Some (int header.Delta.Value.TotalSeconds)
+                                | _ -> None
+                            logger.LogWarning("Rate limited on: {Path}. Retry after: {RetryAfter}s", path, retryAfter)
+                            FrostlineError.RateLimited(retryAfter)
+                        | statusCode ->
+                            logger.LogError("HTTP {StatusCode} error for: {Path}", statusCode, path)
+                            FrostlineError.GeneralError(sprintf "HTTP %d error" statusCode, None)
+                    
+                    return Error error
             with
             | ex -> 
                 logger.LogError(ex, "HTTP request failed for path: {Path}", path)

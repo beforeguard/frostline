@@ -118,12 +118,29 @@ let main argv =
             | Ok profile ->
                 displayCharacterCard profile
                 0 // Success
-            | Error (FrostlineError.GeneralError(message, innerEx)) ->
-                printfn "\n❌ Error: %s" message
-                match innerEx with
-                | Some ex -> printfn "   Details: %s" ex.Message
-                | None -> ()
-                1
+            | Error error ->
+                match error with
+                | FrostlineError.NotFound resource ->
+                    printfn "\n❌ Not Found: %s" resource
+                    printfn "   The character or realm may not exist, or the name may be misspelled."
+                    1
+                | FrostlineError.Unauthorized message ->
+                    printfn "\n❌ Unauthorized: %s" message
+                    printfn "   Check your API credentials are valid."
+                    1
+                | FrostlineError.RateLimited retryAfter ->
+                    match retryAfter with
+                    | Some seconds ->
+                        printfn "\n❌ Rate Limited: Please retry after %d seconds" seconds
+                    | None ->
+                        printfn "\n❌ Rate Limited: Too many requests. Please try again later."
+                    1
+                | FrostlineError.GeneralError(message, innerEx) ->
+                    printfn "\n❌ Error: %s" message
+                    match innerEx with
+                    | Some ex -> printfn "   Details: %s" ex.Message
+                    | None -> ()
+                    1
             
         | [] | ["help"] | ["-h"] | ["--help"] ->
             // Show usage
