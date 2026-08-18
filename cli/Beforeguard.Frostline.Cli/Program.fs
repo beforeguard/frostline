@@ -78,17 +78,8 @@ let displayCharacterCard (profile: CharacterProfile.CharacterProfile) =
     printfn "───────────────────────────────────────────────────────────"
     printfn ""
 
-let getQualityColor (qualityType: string) =
-    match qualityType with
-    | "POOR" -> "\u001b[38;5;157m"        // Gray
-    | "COMMON" -> "\u001b[38;5;255m"      // White  
-    | "UNCOMMON" -> "\u001b[38;5;40m"     // Green
-    | "RARE" -> "\u001b[38;5;33m"         // Blue
-    | "EPIC" -> "\u001b[38;5;141m"        // Purple
-    | "LEGENDARY" -> "\u001b[38;5;208m"   // Orange
-    | "ARTIFACT" -> "\u001b[38;5;229m"    // Gold
-    | "HEIRLOOM" -> "\u001b[38;5;14m"     // Light Blue
-    | _ -> "\u001b[0m"                     // Default
+let toAnsiColor (color: QualityColor) =
+    sprintf "\u001b[38;2;%d;%d;%dm" color.R color.G color.B
 
 let resetColor = "\u001b[0m"
 
@@ -121,7 +112,7 @@ let displayEquipment (equipment: CharacterEquipment.CharacterEquipment) =
         |> List.sortBy (fun item -> item.Slot.Name)
     
     for item in sortedItems do
-        let color = getQualityColor item.Quality.Type
+        let color = ItemQuality.getColor item.Quality.Type |> toAnsiColor
         let enchantIndicator = 
             match item.Enchantments with
             | Some enchants when not enchants.IsEmpty -> " ✨"
