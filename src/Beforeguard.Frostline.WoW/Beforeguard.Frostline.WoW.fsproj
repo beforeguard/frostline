@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="CharacterProfile.fs" />
+    <Compile Include="CharacterEquipment.fs" />
   </ItemGroup>
 
   <ItemGroup>
