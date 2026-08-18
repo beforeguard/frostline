@@ -8,6 +8,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Beforeguard.Frostline.Core.Tests/Beforeguard.Frostline.Core.Tests.fsproj" />
-    <Project Path="tests/Beforeguard.Frostline.Wow.Tests/Beforeguard.Frostline.WoW.Tests.fsproj" />
+    <Project Path="tests/Beforeguard.Frostline.WoW.Tests/Beforeguard.Frostline.WoW.Tests.fsproj" />
   </Folder>
 </Solution>

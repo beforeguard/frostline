@@ -40,8 +40,7 @@ let sampleCharacterJson = """
   "equipped_item_level": 463,
   "guild": {
     "id": 12345,
-    "name": "Test Guild",
-    "realm": "Area 52"
+    "name": "Test Guild"
   }
 }
 """
