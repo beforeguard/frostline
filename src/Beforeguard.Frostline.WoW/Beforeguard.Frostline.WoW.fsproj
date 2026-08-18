@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ItemQuality.fs" />
     <Compile Include="CharacterProfile.fs" />
+    <Compile Include="CharacterEquipment.fs" />
   </ItemGroup>
 
   <ItemGroup>
