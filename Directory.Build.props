@@ -5,9 +5,6 @@
     
     <!-- Package Metadata -->
     <Authors>Brian Egan (Beforeguard)</Authors>
-    
-    <!-- Package Metadata -->
-    <Authors>Brian Egan (Beforeguard)</Authors>
     <Company>Beforeguard</Company>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) Beforeguard</Copyright>
     
