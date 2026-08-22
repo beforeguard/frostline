@@ -1,4 +1,8 @@
-# ❄️ Frostline
+<p align="center">
+  <img src="frostline_icon.png" alt="Frostline" width="150"/>
+</p>
+
+# Frostline
 
 **A modern, idiomatic F# SDK for Blizzard Entertainment's Battle.net APIs**
 
