@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Package-specific metadata -->
+    <PackageId>Beforeguard.Frostline.WoW</PackageId>
+    <Description>World of Warcraft API client for the Frostline Battle.net SDK. Provides type-safe, idiomatic F# bindings for WoW Profile APIs with strongly-typed domain models.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Beforeguard.Frostline.Core\Beforeguard.Frostline.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

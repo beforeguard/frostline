@@ -1,0 +1,36 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches-ignore:
+      - '**'  # Explicitly ignore all branches
+
+permissions:
+  id-token: write  # OIDC token for trusted publishing
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Restore & Build
+      run: dotnet build -c Release
+    
+    - name: Pack
+      run: dotnet pack -c Release --no-build -o ./artifacts
+    
+    - name: Publish to NuGet (Trusted Publishing)
+      run: |
+        dotnet nuget push ./artifacts/*.nupkg \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
