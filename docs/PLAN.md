@@ -2,18 +2,18 @@
 
 > A modern, idiomatic F# SDK for Blizzard APIs.
 
-## Current Status (as of 2026-08-15)
+## Current Status (as of 2026-08-22)
 
 **Version:** `0.2-dev` (First WoW Endpoint + Result Types)
 
 | Phase | Status | Summary |
 |-------|--------|---------|------
-| Phase 1 - Foundation | ✅ **COMPLETE** | OAuth, HTTP client, configuration all working |
+| Phase 1 - Foundation | ✅ **COMPLETE** | OAuth, HTTP client, configuration, CI/CD, and versioning all working |
 | Phase 2 - WoW SDK | 🚧 **IN PROGRESS** | Character Profile ✅ complete with Result types (Equipment & Guild pending) |
 | Phase 3 - CLI | 🚧 **IN PROGRESS** | `character get` command ✅ complete with Result-based error handling |
-| Phase 4 | 🚧 **IN PROGRESS** | Result-based error handling ✅ implemented, CI/CD & publishing pending |
+| Phase 4 | 🚧 **IN PROGRESS** | Result-based error handling ✅ complete, publishing pending |
 
-**Latest Achievement:** Implemented idiomatic F# error handling with `Result<'T, FrostlineError>` throughout the SDK! 🎉
+**Latest Achievement:** Completed Phase 1 foundation work with CI/CD pipeline, package versioning, and comprehensive error handling! 🎉
 
 ---
 
@@ -44,8 +44,8 @@ The **Frostline CLI** will serve as the primary consumer and reference applicati
 - [x] Create F# solution
 - [x] Establish project structure
 - [x] Set up testing
-- [ ] Set up CI
-- [ ] Establish package naming and versioning conventions
+- [x] Set up CI
+- [x] Establish package naming and versioning conventions
 - [x] Create initial documentation
 
 ### Core
@@ -54,7 +54,7 @@ The **Frostline CLI** will serve as the primary consumer and reference applicati
 - [x] OAuth authentication
 - [x] Token management
 - [x] JSON serialization
-- [ ] Basic error handling (deferred to Phase 4)
+- [x] Basic error handling (implemented with Result types)
 - [x] Configuration
 
 **Milestone:** ✅ Frostline can authenticate and make an authenticated Blizzard API request.
@@ -442,24 +442,26 @@ Based on current progress, here are recommended issues to create:
 
 ## High Priority (Foundation Polish)
 
-1. **Add CI/CD Pipeline** (Phase 1)
-   - Set up GitHub Actions for build and test
-   - Run tests on PR and main branch
-   - Validate .NET 10 compatibility
+1. **Add CI/CD Pipeline** (Phase 1) ✅ **COMPLETE**
+   - [x] Set up GitHub Actions for build and test
+   - [x] Run tests on PR and main branch
+   - [x] Validate .NET 10 compatibility
 
-2. **Add Package Versioning** (Phase 1)
-   - Create Directory.Build.props with version numbers
-   - Standardize NuGet metadata
-   - Set up semantic versioning
+2. **Add Package Versioning** (Phase 1) ✅ **COMPLETE**
+   - [x] Create Directory.Build.props with version numbers
+   - [x] Standardize NuGet metadata
+   - [x] Set up semantic versioning
+   - [x] Source Link support
+   - [x] Symbol packages (snupkg)
 
 3. **Error Handling with Result Types** (Phase 4) ✅ **COMPLETE**
    - [x] Replace exceptions with `Result<'T, FrostlineError>`
-   - [x] Add FrostlineError discriminated union (GeneralError implemented)
+   - [x] Add FrostlineError discriminated union with all error cases
    - [x] Update BattleNetHttpClient to return Result types
    - [x] Update CharacterProfile.get to return Result types
    - [x] Update CLI to pattern match on Result
-   - [ ] Add specific error cases (NotFound, Unauthorized, RateLimited) - easy to extend later
-   - [ ] Update tests for error scenarios
+   - [x] Add specific error cases (NotFound, Unauthorized, RateLimited)
+   - [ ] Update tests for error scenarios (can be done later)
 
 ## Medium Priority (WoW Expansion)
 
@@ -497,13 +499,18 @@ Based on current progress, here are recommended issues to create:
 
 ## Recent Progress
 
-**2026-08-15**: Implemented Result-based error handling
-- Created `FrostlineError` discriminated union with `GeneralError` case
-- Updated `BattleNetHttpClient.getAsync` to return `Task<Result<string, FrostlineError>>`
-- Made `BattleNetHttpClient` generic to handle deserialization: `getAsync<'T>`
-- Updated `CharacterProfile.get` to return `Async<Result<CharacterProfile, FrostlineError>>`
-- Updated CLI to pattern match on Result types for proper error display
-- Architecture now follows idiomatic F# patterns with explicit error handling
-- Easy to extend with specific error cases (NotFound, Unauthorized, etc.) when needed
+**2026-08-22**: Completed Phase 1 Foundation
+- ✅ GitHub Actions CI/CD pipeline with build and test workflows
+- ✅ Complete package versioning with Directory.Build.props
+- ✅ NuGet metadata, Source Link, and symbol packages configured
+- ✅ Semantic versioning with versionize
 
-Current milestone: **v0.2** - First WoW endpoint complete with Result types! 🎉
+**2026-08-15**: Implemented Result-based error handling
+- Created comprehensive `FrostlineError` discriminated union with all error cases
+- Updated `BattleNetHttpClient.getAsync` to return `Task<Result<'T, FrostlineError>>`
+- Made `BattleNetHttpClient` generic to handle deserialization
+- Updated `CharacterProfile.get` to return `Async<Result<CharacterProfile, FrostlineError>>`
+- Updated CLI to pattern match on all Result error cases
+- Architecture now follows idiomatic F# patterns with explicit error handling
+
+Current milestone: **v0.2** - First WoW endpoint complete with full Result types and Phase 1 foundation complete! 🎉
