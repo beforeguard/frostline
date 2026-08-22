@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches-ignore:
+      - '**'  # Explicitly ignore all branches
 
 permissions:
   id-token: write  # OIDC token for trusted publishing
