@@ -16,6 +16,9 @@
     <!-- License -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     
+    <!-- Package Icon -->
+    <PackageIcon>frostline_icon.png</PackageIcon>
+    
     <!-- Tags & Classification -->
     <PackageTags>fsharp;battlenet;blizzard;worldofwarcraft;wow;api;sdk</PackageTags>
     
@@ -34,5 +37,10 @@
   <!-- Source Link support for debugging -->
   <ItemGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Include package icon -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)frostline_icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
