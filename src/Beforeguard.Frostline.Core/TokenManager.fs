@@ -3,6 +3,7 @@ namespace Beforeguard.Frostline.Core
 open System
 open System.Collections.Generic
 open System.Net.Http
+open System.Runtime.InteropServices
 open System.Text.Json
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
@@ -15,9 +16,9 @@ type TokenResponse = {
 }
 
 /// Manages OAuth access tokens
-type TokenManager(config: ClientConfig, ?logger: ILogger<TokenManager>) =
+type TokenManager(config: ClientConfig, [<Optional; DefaultParameterValue(null: ILogger<TokenManager>)>] logger: ILogger<TokenManager>) =
     
-    let logger = defaultArg logger (NullLogger<TokenManager>.Instance :> ILogger<TokenManager>)
+    let logger = if isNull (box logger) then NullLogger<TokenManager>.Instance :> ILogger<TokenManager> else logger
     let httpClient = new HttpClient()
     let mutable cachedToken: string option = None
     let mutable tokenExpiry: DateTimeOffset option = None

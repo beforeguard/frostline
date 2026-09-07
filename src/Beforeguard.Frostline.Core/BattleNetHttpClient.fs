@@ -3,15 +3,16 @@ namespace Beforeguard.Frostline.Core
 open System
 open System.Net.Http
 open System.Net.Http.Headers
+open System.Runtime.InteropServices
 open System.Text.Json
 open System.Threading.Tasks
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
 
 /// Simple HTTP client for making requests to Blizzard APIs with OAuth authentication
-type BattleNetHttpClient(region: Region, tokenManager: TokenManager, ?logger: ILogger<BattleNetHttpClient>) =
+type BattleNetHttpClient(region: Region, tokenManager: TokenManager, [<Optional; DefaultParameterValue(null: ILogger<BattleNetHttpClient>)>] logger: ILogger<BattleNetHttpClient>) =
     
-    let logger = defaultArg logger (NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient>)
+    let logger = if isNull (box logger) then NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient> else logger
     let httpClient = new HttpClient()
     let baseUrl = sprintf "https://%s" (Region.toHostname region)
     

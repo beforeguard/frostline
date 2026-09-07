@@ -13,10 +13,15 @@
   <ItemGroup>
     <Compile Include="FrostlineError.fs" />
     <Compile Include="Region.fs" />
+    <Compile Include="RegionExtensions.fs" />
+    <Compile Include="ResultExtensions.fs" />
     <Compile Include="ClientConfig.fs" />
     <Compile Include="TokenManager.fs" />
     <Compile Include="BattleNetHttpClient.fs" />
   </ItemGroup>
+
+
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
