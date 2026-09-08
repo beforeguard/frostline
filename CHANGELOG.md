@@ -5,6 +5,13 @@ All notable changes to Frostline will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<a name="0.4.0"></a>
+## [0.4.0](https://www.github.com/beforeguard/frostline/releases/tag/v0.4.0) (2026-09-08)
+
+### Features
+
+* add generic csharp friendly result handling ([#13](https://www.github.com/beforeguard/frostline/issues/13)) ([2fa5738](https://www.github.com/beforeguard/frostline/commit/2fa57384fe9cffbe42d0cb48031fc6459e0521e7))
+
 <a name="0.3.0"></a>
 ## [0.3.0](https://www.github.com/beforeguard/frostline/releases/tag/v0.3.0) (2026-09-07)
 
