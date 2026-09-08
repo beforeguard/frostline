@@ -8,9 +8,19 @@ open Beforeguard.Frostline.Core
 type BattleNetHttpClientExtensions =
 
     [<Extension>]
-    static member GetCharacterProfileAsync(client: BattleNetHttpClient, realm: string, characterName: string) =
-        CharacterProfile.get client client.Region realm characterName |> Async.StartAsTask
+    static member GetCharacterProfileAsync(
+        client: BattleNetHttpClient,
+        realm: string,
+        characterName: string
+    ) =
+        CharacterProfile.get client client.Region realm characterName
+        |> AsyncResult.startAsTask
 
     [<Extension>]
-    static member GetCharacterEquipmentAsync(client: BattleNetHttpClient, realm: string, characterName: string) =
-        CharacterEquipment.get client client.Region realm characterName |> Async.StartAsTask
+    static member GetCharacterEquipmentAsync(
+        client: BattleNetHttpClient,
+        realm: string,
+        characterName: string
+    ) =
+        CharacterEquipment.get client client.Region realm characterName
+        |> AsyncResult.startAsTask
