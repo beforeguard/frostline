@@ -3,20 +3,24 @@ namespace Beforeguard.Frostline.Core
 open System
 open System.Net.Http
 open System.Net.Http.Headers
-open System.Runtime.InteropServices
 open System.Text.Json
 open System.Threading.Tasks
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
 
 /// Simple HTTP client for making requests to Blizzard APIs with OAuth authentication
-type BattleNetHttpClient(config: ClientConfig, [<Optional; DefaultParameterValue(null: ILogger<BattleNetHttpClient>)>] logger: ILogger<BattleNetHttpClient>) =
+type BattleNetHttpClient(config: ClientConfig, logger: ILogger<BattleNetHttpClient>) =
     
-    let logger = if isNull (box logger) then NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient> else logger
     let tokenManager = new TokenManager(config)
     let httpClient = new HttpClient()
     let baseUrl = sprintf "https://%s" (Region.toHostname config.Region)
     
+    new(config: ClientConfig) =
+        new BattleNetHttpClient(
+            config,
+            NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient>
+        )
+
     /// The region this client was configured for
     member this.Region = config.Region
     
@@ -42,7 +46,10 @@ type BattleNetHttpClient(config: ClientConfig, [<Optional; DefaultParameterValue
                     // Deserialize here
                     let options = JsonSerializerOptions()
                     options.PropertyNameCaseInsensitive <- true
-                    let result = JsonSerializer.Deserialize<'T>(content, options)
+                    let result = 
+                        match JsonSerializer.Deserialize<'T>(content, options) with
+                        | null -> raise (FrostlineException(FrostlineError.GeneralError("Get response was empty or invalid", None)))
+                        | value -> value
                     
                     logger.LogInformation("Successfully deserialized {Type} from {Path}", typeof<'T>.Name, path)
                     

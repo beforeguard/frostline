@@ -1,5 +1,7 @@
 namespace Beforeguard.Frostline.Core
 
+open System
+
 type FrostlineError =
     | GeneralError of message: string * innerException: exn option
     | NotFound of resource: string
@@ -14,3 +16,9 @@ type FrostlineError =
         | Unauthorized message -> message
         | RateLimited(Some seconds) -> sprintf "Rate limited, retry after %ds" seconds
         | RateLimited None -> "Rate limited"
+
+[<Sealed>]
+type FrostlineException(error: FrostlineError) =
+    inherit Exception(error.Message)
+
+    member _.Error = error
