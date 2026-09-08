@@ -25,8 +25,7 @@ open Beforeguard.Frostline.WoW
 
 // Configure authentication
 let config = ClientConfig.create "your-client-id" "your-client-secret" Region.US
-use tokenManager = new TokenManager(config)
-let httpClient = BattleNetHttpClient(Region.US, tokenManager)
+use httpClient = new BattleNetHttpClient(config)
 
 // Get character profile
 let! result = CharacterProfile.get httpClient "tichondrius" "charactername"

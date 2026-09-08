@@ -10,11 +10,15 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
 
 /// Simple HTTP client for making requests to Blizzard APIs with OAuth authentication
-type BattleNetHttpClient(region: Region, tokenManager: TokenManager, [<Optional; DefaultParameterValue(null: ILogger<BattleNetHttpClient>)>] logger: ILogger<BattleNetHttpClient>) =
+type BattleNetHttpClient(config: ClientConfig, [<Optional; DefaultParameterValue(null: ILogger<BattleNetHttpClient>)>] logger: ILogger<BattleNetHttpClient>) =
     
     let logger = if isNull (box logger) then NullLogger<BattleNetHttpClient>.Instance :> ILogger<BattleNetHttpClient> else logger
+    let tokenManager = new TokenManager(config)
     let httpClient = new HttpClient()
-    let baseUrl = sprintf "https://%s" (Region.toHostname region)
+    let baseUrl = sprintf "https://%s" (Region.toHostname config.Region)
+    
+    /// The region this client was configured for
+    member this.Region = config.Region
     
     /// Make an authenticated GET request to the specified path
     member this.getAsync<'T>(path: string) : Task<Result<'T, FrostlineError>> =
@@ -77,3 +81,4 @@ type BattleNetHttpClient(region: Region, tokenManager: TokenManager, [<Optional;
     interface IDisposable with
         member this.Dispose() =
             httpClient.Dispose()
+            (tokenManager :> IDisposable).Dispose()

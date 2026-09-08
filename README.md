@@ -47,8 +47,7 @@ open Beforeguard.Frostline.Core
 let config = ClientConfig.create "your-client-id" "your-secret" Region.US
 
 // Authenticate and make API calls
-use tokenManager = new TokenManager(config)
-let httpClient = BattleNetHttpClient(Region.US, tokenManager)
+use httpClient = new BattleNetHttpClient(config)
 
 // Call any Battle.net endpoint
 let! response = 

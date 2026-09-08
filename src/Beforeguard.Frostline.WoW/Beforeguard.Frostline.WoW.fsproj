@@ -14,7 +14,9 @@
     <Compile Include="ItemQuality.fs" />
     <Compile Include="CharacterProfile.fs" />
     <Compile Include="CharacterEquipment.fs" />
+    <Compile Include="BattleNetHttpClientExtensions.fs" />
   </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\Beforeguard.Frostline.Core\Beforeguard.Frostline.Core.fsproj" />
