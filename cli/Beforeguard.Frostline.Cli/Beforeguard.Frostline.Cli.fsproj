@@ -5,6 +5,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>frostline</AssemblyName>
     <UserSecretsId>573ea996-6fdc-419e-8052-0241e51ab638</UserSecretsId>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

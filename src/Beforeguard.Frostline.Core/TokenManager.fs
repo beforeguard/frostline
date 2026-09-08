@@ -3,7 +3,6 @@ namespace Beforeguard.Frostline.Core
 open System
 open System.Collections.Generic
 open System.Net.Http
-open System.Runtime.InteropServices
 open System.Text.Json
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
@@ -16,13 +15,18 @@ type TokenResponse = {
 }
 
 /// Manages OAuth access tokens
-type TokenManager(config: ClientConfig, [<Optional; DefaultParameterValue(null: ILogger<TokenManager>)>] logger: ILogger<TokenManager>) =
-    
-    let logger = if isNull (box logger) then NullLogger<TokenManager>.Instance :> ILogger<TokenManager> else logger
+type TokenManager(config: ClientConfig, logger: ILogger<TokenManager>) =
+
     let httpClient = new HttpClient()
     let mutable cachedToken: string option = None
     let mutable tokenExpiry: DateTimeOffset option = None
     
+    new(config: ClientConfig) =
+        new TokenManager(
+            config,
+            NullLogger<TokenManager>.Instance :> ILogger<TokenManager>
+        )
+
     /// Request a new access token from Battle.net
     member private this.requestNewToken() =
         async {
@@ -40,7 +44,10 @@ type TokenManager(config: ClientConfig, [<Optional; DefaultParameterValue(null: 
             response.EnsureSuccessStatusCode() |> ignore
             
             let! json = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-            let tokenResponse = JsonSerializer.Deserialize<TokenResponse>(json)
+            let tokenResponse = 
+                match JsonSerializer.Deserialize<TokenResponse>(json) with
+                | null -> raise (FrostlineException(FrostlineError.GeneralError("Token response was empty or invalid", None)))
+                | value -> value
             
             logger.LogInformation("Token received, expires in {ExpiresIn} seconds", tokenResponse.expires_in)
             

@@ -13,9 +13,24 @@ let loadConfigFromEnvironment () =
             .AddEnvironmentVariables()
             .Build()
     
-    let clientId = config.["BattleNet:ClientId"]
-    let clientSecret = config.["BattleNet:ClientSecret"]
-    let regionStr = config.["BattleNet:Region"]
+    let clientId =
+        match config.["BattleNet:ClientId"] with
+        | null -> failwith "BattleNet:ClientId not configured. Use dotnet user-secrets or environment variables."
+        | value when String.IsNullOrWhiteSpace value ->
+            failwith "BattleNet:ClientId not configured. Use dotnet user-secrets or environment variables."
+        | value -> value
+
+    let clientSecret =
+        match config.["BattleNet:ClientSecret"] with
+        | null -> failwith "BattleNet:ClientSecret not configured. Use dotnet user-secrets or environment variables."
+        | value when String.IsNullOrWhiteSpace value ->
+            failwith "BattleNet:ClientSecret not configured. Use dotnet user-secrets or environment variables."
+        | value -> value
+
+    let regionStr =
+        match config.["BattleNet:Region"] with
+        | null | "" -> "US"
+        | s -> s.ToUpperInvariant()
     
     if String.IsNullOrWhiteSpace(clientId) then
         failwith "BattleNet:ClientId not configured. Use dotnet user-secrets or environment variables."
@@ -278,6 +293,7 @@ let main argv =
     with
     | ex ->
         printfn "\n❌ Error: %s" ex.Message
-        if ex.InnerException <> null then
-            printfn "   Details: %s" ex.InnerException.Message
+        match ex.InnerException with
+        | null -> ()
+        | inner -> printfn "   Details: %s" inner.Message
         1
