@@ -24,9 +24,8 @@ open Beforeguard.Frostline.Core
 // Configure with your Battle.net credentials
 let config = ClientConfig.create "your-client-id" "your-client-secret" Region.US
 
-// Create token manager and HTTP client
-use tokenManager = new TokenManager(config)
-let httpClient = BattleNetHttpClient(Region.US, tokenManager)
+// Create HTTP client
+let httpClient = new BattleNetHttpClient(config)
 
 // Make authenticated API calls
 let! result = httpClient.GetAsync<'T>("profile/user/wow")

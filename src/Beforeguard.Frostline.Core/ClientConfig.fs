@@ -9,6 +9,11 @@ type ClientConfig = {
     Region: Region
 }
 
+    with
+    /// C#-friendly factory; the ClientConfig module's `create` is renamed to ClientConfigModule by the compiler
+    static member Create(clientId, clientSecret, region) =
+        { ClientId = clientId; ClientSecret = clientSecret; Region = region }
+
 module ClientConfig =
     /// Create a new configuration
     let create clientId clientSecret region =

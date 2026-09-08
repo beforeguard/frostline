@@ -176,11 +176,9 @@ let main argv =
         let clientConfig = loadConfigFromEnvironment()
         
         // Create loggers and components
-        let tokenManagerLogger = loggerFactory.CreateLogger<TokenManager>()
         let httpClientLogger = loggerFactory.CreateLogger<BattleNetHttpClient>()
         
-        use tokenManager = new TokenManager(clientConfig, tokenManagerLogger)
-        use httpClient = new BattleNetHttpClient(clientConfig.Region, tokenManager, httpClientLogger)
+        use httpClient = new BattleNetHttpClient(clientConfig, httpClientLogger)
         
         // Parse command-line arguments
         match argv |> Array.toList with
