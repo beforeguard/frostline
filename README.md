@@ -30,6 +30,11 @@ Frostline provides type-safe, async-first access to World of Warcraft, Diablo, S
 - Character, equipment, and media endpoints
 - Additional games coming soon
 
+🤝 **C# Interoperability**
+- Task-returning client methods and `Result` extensions (`Match`, `TryGetValue`)
+- Real .NET optional parameters instead of F#-only optional args
+- Human-readable `FrostlineError.Message` for error handling without pattern matching
+
 ## Status
 
 **Early Development** - Core OAuth infrastructure complete and tested against live Battle.net APIs. WoW data models in progress.
@@ -39,6 +44,8 @@ This is a learning-focused project demonstrating F# best practices for SDK devel
 > **⚠️ Disclaimer**: This is an unofficial, community-created project and is not affiliated with, endorsed by, or supported by Blizzard Entertainment, Inc. Battle.net, World of Warcraft, Diablo, StarCraft, and all associated properties are trademarks or registered trademarks of Blizzard Entertainment, Inc.
 
 ## Quick Start
+
+### F#
 
 ```fsharp
 open Beforeguard.Frostline.Core
@@ -55,6 +62,26 @@ let! response =
     |> Async.AwaitTask
 ```
 
+### C#
+
+```csharp
+using Beforeguard.Frostline.Core;
+using Beforeguard.Frostline.WoW;
+
+// Configure with your Battle.net credentials
+var config = ClientConfig.Create("your-client-id", "your-secret", Region.US);
+
+// Authenticate and make API calls
+using var httpClient = new BattleNetHttpClient(config);
+
+// Call a WoW endpoint directly - no F# Result/Async knowledge required
+var result = await httpClient.GetCharacterProfileAsync("tichondrius", "charactername");
+
+result.Match(
+    onOk: profile => { Console.WriteLine($"Character: {profile.Name}"); return 0; },
+    onError: err => { Console.WriteLine($"Error: {err.Message}"); return 1; });
+```
+
 ## Project Structure
 
 ```
@@ -67,6 +94,7 @@ cli/
 
 tests/
   Beforeguard.Frostline.Core.Tests/
+  Beforeguard.Frostline.Core.Tests.CSharp/
   Beforeguard.Frostline.WoW.Tests/
 ```
 
@@ -116,10 +144,11 @@ dotnet run --project cli/Beforeguard.Frostline.Cli
 - [x] Multi-region support
 - [x] Token caching and automatic refresh
 - [x] HTTP client with bearer token injection
-- [ ] Error handling with Result types
+- [x] Error handling with Result types
 - [ ] Retry logic and rate limiting
-- [ ] WoW Character Profile API
-- [ ] WoW Equipment and Media APIs
+- [x] WoW Character Profile API
+- [x] WoW Character Equipment API
+- [ ] WoW Media API
 - [ ] Static data endpoints (items, achievements)
 - [ ] Additional game APIs (Diablo, StarCraft)
 
