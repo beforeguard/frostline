@@ -1,4 +1,6 @@
 ﻿open System
+open System.IO
+open System.Text.Json
 open Beforeguard.Frostline.Core
 open Beforeguard.Frostline.WoW
 open Microsoft.Extensions.Configuration
@@ -271,15 +273,69 @@ let main argv =
                     | None -> ()
                     1
             
+        | "probe" :: path :: rest ->
+            // Raw, untyped capture of any Battle.net endpoint response for scaffolding new models
+            let outputPath =
+                match rest with
+                | file :: _ -> file
+                | [] ->
+                    let safeName = path.Split('?').[0].Trim('/').Replace('/', '-')
+                    Path.Combine("samples", safeName + ".json")
+
+            printfn "\n🔎 Probing: %s" path
+            printfn "   Authenticating..."
+
+            let result =
+                httpClient.getAsync<JsonElement>(path)
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            match result with
+            | Ok json ->
+                let options = JsonSerializerOptions(WriteIndented = true)
+                let pretty = JsonSerializer.Serialize(json, options)
+
+                match Path.GetDirectoryName(outputPath) with
+                | null
+                | "" -> ()
+                | directory -> Directory.CreateDirectory(directory) |> ignore
+
+                File.WriteAllText(outputPath, pretty)
+
+                printfn "\n✅ Saved response to: %s" outputPath
+                printfn "   %d bytes written" pretty.Length
+                0
+            | Error error ->
+                match error with
+                | FrostlineError.NotFound resource ->
+                    printfn "\n❌ Not Found: %s" resource
+                    1
+                | FrostlineError.Unauthorized message ->
+                    printfn "\n❌ Unauthorized: %s" message
+                    1
+                | FrostlineError.RateLimited retryAfter ->
+                    match retryAfter with
+                    | Some seconds -> printfn "\n❌ Rate Limited: Please retry after %d seconds" seconds
+                    | None -> printfn "\n❌ Rate Limited: Too many requests. Please try again later."
+                    1
+                | FrostlineError.GeneralError(message, innerEx) ->
+                    printfn "\n❌ Error: %s" message
+                    match innerEx with
+                    | Some ex -> printfn "   Details: %s" ex.Message
+                    | None -> ()
+                    1
+
         | [] | ["help"] | ["-h"] | ["--help"] ->
             // Show usage
             printfn "\nUsage:"
             printfn "  frostline character get <realm> <characterName>"
             printfn "  frostline character equipment <realm> <characterName>"
+            printfn "  frostline probe <path> [outputFile]"
             printfn ""
             printfn "Examples:"
             printfn "  frostline character get tichondrius beforeguard"
             printfn "  frostline character equipment \"area 52\" thrall"
+            printfn "  frostline probe \"/profile/wow/character/tichondrius/beforeguard/equipment?namespace=profile-us&locale=en_US\""
             printfn ""
             printfn "Configuration:"
             printfn "  Region: %s (from config)" (Region.toString clientConfig.Region)
