@@ -275,8 +275,11 @@ let main argv =
             
         | "probe" :: path :: rest ->
             // Raw, untyped capture of any Battle.net endpoint response for scaffolding new models
+            let printOnly = rest |> List.exists (fun a -> a = "--print" || a = "-p")
+            let outputArgs = rest |> List.filter (fun a -> a <> "--print" && a <> "-p")
+
             let outputPath =
-                match rest with
+                match outputArgs with
                 | file :: _ -> file
                 | [] ->
                     let safeName = path.Split('?').[0].Trim('/').Replace('/', '-')
@@ -295,16 +298,21 @@ let main argv =
                 let options = JsonSerializerOptions(WriteIndented = true)
                 let pretty = JsonSerializer.Serialize(json, options)
 
-                match Path.GetDirectoryName(outputPath) with
-                | null
-                | "" -> ()
-                | directory -> Directory.CreateDirectory(directory) |> ignore
+                if printOnly then
+                    printfn ""
+                    printfn "%s" pretty
+                    0
+                else
+                    match Path.GetDirectoryName(outputPath) with
+                    | null
+                    | "" -> ()
+                    | directory -> Directory.CreateDirectory(directory) |> ignore
 
-                File.WriteAllText(outputPath, pretty)
+                    File.WriteAllText(outputPath, pretty)
 
-                printfn "\n✅ Saved response to: %s" outputPath
-                printfn "   %d bytes written" pretty.Length
-                0
+                    printfn "\n✅ Saved response to: %s" outputPath
+                    printfn "   %d bytes written" pretty.Length
+                    0
             | Error error ->
                 match error with
                 | FrostlineError.NotFound resource ->
@@ -330,12 +338,12 @@ let main argv =
             printfn "\nUsage:"
             printfn "  frostline character get <realm> <characterName>"
             printfn "  frostline character equipment <realm> <characterName>"
-            printfn "  frostline probe <path> [outputFile]"
+            printfn "  frostline probe <path> [outputFile] [--print|-p]"
             printfn ""
             printfn "Examples:"
             printfn "  frostline character get tichondrius beforeguard"
             printfn "  frostline character equipment \"area 52\" thrall"
-            printfn "  frostline probe \"/profile/wow/character/tichondrius/beforeguard/equipment?namespace=profile-us&locale=en_US\""
+            printfn "  frostline probe \"/profile/wow/character/tichondrius/beforeguard/equipment?namespace=profile-us&locale=en_US\" --print"
             printfn ""
             printfn "Configuration:"
             printfn "  Region: %s (from config)" (Region.toString clientConfig.Region)
